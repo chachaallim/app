@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/screenScroll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/chacha_background"
+    android:fillViewport="true"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:id="@+id/contentColumn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="24dp">
+
+        <LinearLayout
+            android:id="@+id/brandHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_chacha_car" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:text="@string/brand_name"
+                android:textColor="@color/chacha_text"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/gear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_chacha_pill"
+                android:paddingStart="18dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="18dp"
+                android:paddingBottom="10dp"
+                android:textColor="@color/chacha_muted"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/mainStateCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_chacha_hero"
+            android:gravity="center_vertical"
+            android:minHeight="440dp"
+            android:orientation="vertical"
+            android:padding="32dp">
+
+            <LinearLayout
+                android:id="@+id/reminderCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reminder_title"
+                    android:textColor="@color/chacha_blue"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/reminderText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:textColor="@color/chacha_text"
+                    android:textSize="42sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/completeButton"
+                    android:layout_width="320dp"
+                    android:layout_height="80dp"
+                    android:layout_marginTop="36dp"
+                    android:text="@string/reminder_complete"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="20dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/normalContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/voiceArea"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <FrameLayout
+                        android:layout_width="168dp"
+                        android:layout_height="160dp">
+
+                        <View
+                            android:id="@+id/sttPulse"
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_chacha_pulse"
+                            android:visibility="gone" />
+
+                        <ImageButton
+                            android:id="@+id/sttButton"
+                            android:layout_width="116dp"
+                            android:layout_height="116dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_chacha_mic"
+                            android:contentDescription="@string/voice_action"
+                            android:padding="34dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/ic_chacha_mic" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:text="@string/voice_hint"
+                        android:textColor="@color/chacha_muted"
+                        android:textSize="19sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/statusArea"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/statusTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/hero_question"
+                        android:textColor="@color/chacha_text"
+                        android:textSize="36sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/stateDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/brand_slogan"
+                        android:textColor="@color/chacha_muted"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:id="@+id/pendingText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="22dp"
+                        android:textColor="@color/chacha_text"
+                        android:textSize="30sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/pendingHint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:textColor="@color/chacha_muted"
+                        android:textSize="20sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/sttResult"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:textColor="@color/chacha_text"
+                        android:textSize="23sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/taskStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:textColor="@color/chacha_muted"
+                        android:textSize="20sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/sttStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:textColor="@color/chacha_muted"
+                        android:textSize="17sp"
+                        android:visibility="gone" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/developerPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_chacha_panel"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/developer_title"
+                android:textColor="@color/chacha_text"
+                android:textSize="21sp"
+                android:textStyle="bold" />
+
+            <TextView android:id="@+id/connection" style="@style/ChachaDiagnosticText" />
+            <TextView android:id="@+id/raw" style="@style/ChachaDiagnosticText" />
+            <TextView android:id="@+id/lastEvent" style="@style/ChachaDiagnosticText" />
+            <TextView android:id="@+id/ignitionSupport" style="@style/ChachaDiagnosticText" />
+            <TextView android:id="@+id/ignitionState" style="@style/ChachaDiagnosticText" />
+            <TextView android:id="@+id/ignitionRaw" style="@style/ChachaDiagnosticText" />
+            <TextView android:id="@+id/ignitionEvent" style="@style/ChachaDiagnosticText" />
+
+            <EditText
+                android:id="@+id/commandInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="@string/test_command_hint"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:textColor="@color/chacha_text"
+                android:textColorHint="@color/chacha_muted"
+                android:textSize="20sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/registerButton"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/test_register"
+                android:textSize="20sp"
+                app:cornerRadius="18dp" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

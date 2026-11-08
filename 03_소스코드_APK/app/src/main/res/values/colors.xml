@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="chacha_background">#111827</color>
+    <color name="chacha_surface">#202D41</color>
+    <color name="chacha_surface_raised">#25384F</color>
+    <color name="chacha_blue">#2D6BEA</color>
+    <color name="chacha_blue_dark">#204FB0</color>
+    <color name="chacha_mic">#31558D</color>
+    <color name="chacha_on_blue">#FFFFFF</color>
+    <color name="chacha_text">#F6F8FC</color>
+    <color name="chacha_muted">#AEBED0</color>
+    <color name="chacha_success">#82E6BD</color>
+    <color name="chacha_error">#FFB5AD</color>
+    <color name="chacha_outline">#36506A</color>
+</resources>

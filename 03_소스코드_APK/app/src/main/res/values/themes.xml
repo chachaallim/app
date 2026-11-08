@@ -1,0 +1,13 @@
+<resources>
+    <style name="Theme.ChachaAlert" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/chacha_blue</item>
+        <item name="colorPrimaryVariant">@color/chacha_blue_dark</item>
+        <item name="colorOnPrimary">@color/chacha_on_blue</item>
+        <item name="colorSecondary">@color/chacha_success</item>
+        <item name="colorOnSecondary">@color/chacha_on_blue</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">@color/chacha_background</item>
+        <item name="android:navigationBarColor">@color/chacha_background</item>
+        <item name="android:windowBackground">@color/chacha_background</item>
+    </style>
+</resources>

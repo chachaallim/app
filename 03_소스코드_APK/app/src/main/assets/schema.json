@@ -1,0 +1,26 @@
+{
+  "packageName": "com.chachaallim.app",
+  "appDescription": "A vehicle reminder app that registers a task to show when the car next enters park after driving.",
+  "invokeWord": "차차알림",
+  "version": "1.0",
+  "actionCalls": [
+    {
+      "type": "function",
+      "function": {
+        "name": "ADD_REMINDER",
+        "description": "Registers a supported reminder for the next transition from drive to park.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string",
+              "description": "The user's reminder request in Korean."
+            }
+          },
+          "required": ["command"]
+        },
+        "component": "service"
+      }
+    }
+  ]
+}

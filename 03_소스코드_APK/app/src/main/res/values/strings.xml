@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">차차알림</string>
+    <string name="brand_name">차차알림</string>
+    <string name="brand_slogan">말로 맡기고, 차가 기억합니다.</string>
+    <string name="voice_action">음성으로 등록</string>
+    <string name="voice_hint">마이크를 눌러 음성으로 맡기기</string>
+    <string name="developer_title">개발용 진단 및 텍스트 입력</string>
+    <string name="voice_stop">음성 인식 중지</string>
+    <string name="voice_cancel_final">최종 결과 대기 취소</string>
+    <string name="hero_question">무엇을 기억해 드릴까요?</string>
+    <string name="reminder_title">지금 챙겨 주세요</string>
+    <string name="reminder_complete">완료</string>
+    <string name="registration_spoken_confirmation">주차하시면 알려드릴게요.</string>
+    <string name="pending_label">등록된 알림</string>
+    <string name="pending_empty">등록된 알림이 없어요</string>
+    <string name="pending_empty_hint">마이크를 눌러 알림을 등록해 보세요.</string>
+    <string name="pending_notebook">내릴 때 노트북 챙기기</string>
+    <string name="pending_next_park">다음 주차 시 알려드릴게요.</string>
+    <string name="pending_armed">P단에 들어가면 알려드릴게요.</string>
+    <string name="diagnostics_toggle">차량·STT 진단 정보 보기</string>
+    <string name="test_toggle">테스트용 텍스트 입력</string>
+    <string name="test_command_hint">테스트 명령</string>
+    <string name="test_register">텍스트로 맡기기</string>
+</resources>
