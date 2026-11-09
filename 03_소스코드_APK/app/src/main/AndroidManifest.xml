@@ -4,6 +4,9 @@
 
     <uses-feature android:name="android.hardware.type.automotive" android:required="true" />
     <uses-permission android:name="android.car.permission.CAR_POWERTRAIN" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="pleos.car.permission.STT_SERVICE" />
     <uses-permission android:name="pleos.car.permission.TTS_SERVICE" />
 
@@ -17,11 +20,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ChachaAlert">
         <uses-library android:name="android.car" android:required="false" />
-        <receiver android:name=".GleoReminderReceiver" android:exported="false">
+        <receiver
+            android:name=".GleoReminderReceiver"
+            android:exported="true"
+            android:permission="ai.umos.gleo.permission.APP_ACTION">
             <intent-filter>
                 <action android:name="ADD_REMINDER" />
             </intent-filter>
         </receiver>
+        <service
+            android:name=".ParkingReminderService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Monitor vehicle gear while a user-requested next-parking reminder is pending, then deliver it and stop." />
+        </service>
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

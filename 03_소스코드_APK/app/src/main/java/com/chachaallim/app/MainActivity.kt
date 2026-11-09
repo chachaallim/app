@@ -1,6 +1,9 @@
 package com.chachaallim.app
 
+import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
+import android.app.NotificationManager
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
@@ -12,11 +15,13 @@ import android.car.hardware.CarPropertyValue
 import android.car.hardware.property.CarPropertyManager
 import android.car.drivingstate.CarUxRestrictions
 import android.car.drivingstate.CarUxRestrictionsManager
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.os.Handler
 import android.os.Looper
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.util.Log
@@ -26,6 +31,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import android.widget.Toast
 import android.view.View
 import ai.pleos.playground.stt.SpeechToText
 import ai.pleos.playground.stt.constant.ErrorType
@@ -52,6 +58,8 @@ class MainActivity : Activity() {
     private lateinit var reminderCard: LinearLayout
     private lateinit var reminderText: TextView
     private lateinit var sttButton: ImageButton
+    private lateinit var retryVoiceButton: Button
+    private lateinit var cancelReminderButton: Button
     private lateinit var sttPulse: View
     private var pulseAnimator: ObjectAnimator? = null
     private lateinit var sttStatus: TextView
@@ -76,15 +84,15 @@ class MainActivity : Activity() {
     @Volatile private var sttState = SttState.IDLE
     private var gearReadSinceStart = false
     @Volatile private var currentGear: Int? = null
-    private var pendingCommand: Reminder? = null
-    private var pendingSource: String? = null
-    private var needsReminderReconcile = true
+    private var pendingCommand: ReminderStore.Pending? = null
+    private var resumed = false
     private val reminderStore by lazy { ReminderStore(this) }
-    private val reminderSpeaker by lazy { PleosReminderSpeaker(this) }
-    private var speechEventCounter = 0L
     private val reminderPrefs by lazy { getSharedPreferences(ReminderStore.PREFS, Context.MODE_PRIVATE) }
     private val reminderPreferenceListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-        if (key == ReminderStore.KEY_COMMAND) runOnUiThread { syncStoredReminder() }
+        if (key == ReminderStore.KEY_COMMAND || key == ReminderStore.KEY_STATE) {
+            syncStoredReminder()
+            if (key == ReminderStore.KEY_COMMAND) ensureReminderMonitoring()
+        }
     }
     private var triggerState = TriggerState.NONE
     private val worker = Executors.newSingleThreadExecutor()
@@ -109,7 +117,6 @@ class MainActivity : Activity() {
                     if (started) {
                         val observed = value.value as? Int
                         showGear(observed, true)
-                        onGearEvent(observed)
                     }
                 }
             }
@@ -152,6 +159,8 @@ class MainActivity : Activity() {
         reminderCard = findViewById(R.id.reminderCard)
         reminderText = findViewById(R.id.reminderText)
         sttButton = findViewById(R.id.sttButton)
+        retryVoiceButton = findViewById(R.id.retryVoiceButton)
+        cancelReminderButton = findViewById(R.id.cancelReminderButton)
         sttPulse = findViewById(R.id.sttPulse)
         sttStatus = findViewById(R.id.sttStatus)
         sttResult = findViewById(R.id.sttResult)
@@ -199,7 +208,7 @@ class MainActivity : Activity() {
                 )
             }
         }
-        commandInput.setText(ReminderStore.SUPPORTED_COMMAND)
+        commandInput.setText(ReminderStore.EXAMPLE_COMMAND)
         findViewById<Button>(R.id.registerButton).setOnClickListener { registerCommand() }
         completeButton.setOnClickListener { completeReminder() }
         sttButton.isEnabled = false
@@ -210,6 +219,12 @@ class MainActivity : Activity() {
                 finishSttSession()
             }
         }
+        retryVoiceButton.setOnClickListener {
+            if (triggerState == TriggerState.WAITING_FOR_D) {
+                reminderStore.load()?.let { startStt(replacement = it) }
+            }
+        }
+        cancelReminderButton.setOnClickListener { confirmReminderCancellation() }
         val developerPanel = findViewById<LinearLayout>(R.id.developerPanel)
         findViewById<View>(R.id.brandHeader).setOnLongClickListener {
             developerPanel.visibility = if (developerPanel.visibility == View.VISIBLE) View.GONE else View.VISIBLE
@@ -233,9 +248,8 @@ class MainActivity : Activity() {
         logDrive("onStart_enter")
         super.onStart()
         started = true
-        reminderSpeaker.start()
         reminderPrefs.registerOnSharedPreferenceChangeListener(reminderPreferenceListener)
-        needsReminderReconcile = true
+        syncStoredReminder()
         logDrive("onStart_started")
         gearReadSinceStart = false
         updateSttButton()
@@ -297,10 +311,17 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
+        resumed = true
+        ensureReminderMonitoring()
+        if (pendingCommand != null && triggerState != TriggerState.SHOWING) {
+            requestReminderNotificationPermission()
+        }
+        renderUiState()
         logDrive("onResume")
     }
 
     override fun onPause() {
+        resumed = false
         logDrive("onPause")
         super.onPause()
     }
@@ -311,7 +332,6 @@ class MainActivity : Activity() {
             reportStt("Activity 중지로 인식 종료")
             finishSttSession()
         }
-        reminderSpeaker.stop()
         started = false
         reminderPrefs.unregisterOnSharedPreferenceChangeListener(reminderPreferenceListener)
         gearReadSinceStart = false
@@ -462,7 +482,6 @@ class MainActivity : Activity() {
         }
         currentGear = value
         gearReadSinceStart = true
-        syncStoredReminder()
         if (value != VehicleGear.GEAR_PARK && speechToText != null) {
             reportStt("P단 이탈로 인식 종료")
             finishSttSession()
@@ -485,37 +504,34 @@ class MainActivity : Activity() {
     }
 
     private fun syncStoredReminder() {
-        if (!started || !gearReadSinceStart || currentGear == null) return
-        val stored = reminderStore.load() ?: return
-        if (stored.original != ReminderStore.SUPPORTED_COMMAND) {
-            Log.w(REMINDER_TAG, "stored command rejected")
-            return
-        }
-        if (pendingCommand == null) {
-            pendingCommand = Reminder(stored.original, stored.message)
-            pendingSource = stored.source
-            triggerState = TriggerState.entries.firstOrNull { it.name == stored.state } ?: TriggerState.NEW
-        }
-        if (needsReminderReconcile || triggerState == TriggerState.NEW) {
-            if (triggerState != TriggerState.SHOWING) {
-                triggerState = if (currentGear == VehicleGear.GEAR_DRIVE)
-                    TriggerState.WAITING_FOR_P else TriggerState.WAITING_FOR_D
-                if (!reminderStore.updateState(triggerState.name)) {
-                    Log.e(REMINDER_TAG, "reminder state reconciliation failed")
-                    return
-                }
-            }
-            needsReminderReconcile = false
-            Log.i(REMINDER_TAG, "restored source=$pendingSource state=$triggerState gear=$currentGear")
-        }
-        if (triggerState == TriggerState.SHOWING) {
-            reminderText.text = stored.message
-            taskStatus.text = "알림 실행됨"
-        } else {
-            taskStatus.text = if (triggerState == TriggerState.WAITING_FOR_P)
-                "실행 대기: P단 진입" else "실행 대기: 다음 D → P 전환"
-        }
+        if (!started) return
+        val stored = reminderStore.load()
+        pendingCommand = stored
+        triggerState = TriggerState.from(stored?.state)
+        if (triggerState == TriggerState.SHOWING) reminderText.text = stored?.message.orEmpty()
         renderUiState()
+    }
+
+    private fun ensureReminderMonitoring(action: String? = null) {
+        if (resumed && pendingCommand != null && triggerState != TriggerState.SHOWING) {
+            try {
+                startForegroundService(Intent(this, ParkingReminderService::class.java).setAction(action))
+            } catch (error: IllegalStateException) {
+                Log.w(REMINDER_TAG, "Could not start vehicle monitoring", error)
+            } catch (error: SecurityException) {
+                Log.e(REMINDER_TAG, "Vehicle monitoring permission denied", error)
+            }
+        }
+    }
+
+    private fun requestReminderNotificationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        ) return
+        val preferences = getPreferences(Context.MODE_PRIVATE)
+        if (preferences.getBoolean(NOTIFICATIONS_REQUESTED, false)) return
+        preferences.edit().putBoolean(NOTIFICATIONS_REQUESTED, true).apply()
+        requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), NOTIFICATION_PERMISSION_REQUEST)
     }
 
     private fun registerCommand() {
@@ -526,14 +542,14 @@ class MainActivity : Activity() {
 
     private fun announceRegistration() {
         if (!started || currentGear != VehicleGear.GEAR_PARK) return
-        reminderSpeaker.announce(
-            eventId = "registration:${++speechEventCounter}",
-            kind = "registration",
-            text = getString(R.string.registration_spoken_confirmation)
-        )
+        ensureReminderMonitoring(ParkingReminderService.ACTION_CONFIRM_REGISTRATION)
     }
 
-    private fun registerReminder(original: String, source: String): Boolean {
+    private fun registerReminder(
+        original: String,
+        source: String,
+        replacement: ReminderStore.Pending? = null
+    ): Boolean {
         val initialState = if (source == ReminderStore.SOURCE_TEXT && currentGear == VehicleGear.GEAR_DRIVE)
             TriggerState.WAITING_TO_LEAVE_D else TriggerState.WAITING_FOR_D
         if (currentGear == null) {
@@ -543,16 +559,15 @@ class MainActivity : Activity() {
             Log.w(REMINDER_TAG, "registration rejected: gear unavailable source=$source")
             return false
         }
-        val registered = when (reminderStore.register(original, source, initialState.name)) {
+        val registered = when (reminderStore.register(original, source, initialState.name, replacement)) {
             ReminderStore.Registration.UNSUPPORTED -> {
-                taskStatus.text = "지원되지 않는 명령입니다"
+                taskStatus.setText(R.string.unsupported_reminder_command)
                 feedbackKind = FeedbackKind.ERROR
-                Log.w(REMINDER_TAG, "unsupported command source=$source text=$original")
+                Log.w(REMINDER_TAG, "unsupported command source=$source")
                 false
             }
             ReminderStore.Registration.ALREADY_PENDING -> {
-                taskStatus.text = "이미 대기 중인 알림이 있습니다"
-                feedbackKind = FeedbackKind.ERROR
+                feedbackKind = FeedbackKind.PENDING
                 Log.w(REMINDER_TAG, "registration rejected: reminder already pending source=$source")
                 false
             }
@@ -563,12 +578,11 @@ class MainActivity : Activity() {
                 false
             }
             ReminderStore.Registration.REGISTERED -> {
-                pendingCommand = Reminder(original, ReminderStore.REMINDER_MESSAGE)
-                pendingSource = source
-                triggerState = initialState
                 feedbackKind = FeedbackKind.NONE
+                syncStoredReminder()
+                requestReminderNotificationPermission()
                 taskStatus.text = "실행 대기: 다음 D → P 전환"
-                Log.i(REMINDER_TAG, "registered source=$source original=$original state=$triggerState")
+                Log.i(REMINDER_TAG, "registered source=$source state=$triggerState")
                 true
             }
         }
@@ -576,59 +590,42 @@ class MainActivity : Activity() {
         return registered
     }
 
-    private fun onGearEvent(observed: Int?) {
-        Log.i(REMINDER_TAG, "vehicle gear event raw=$observed state=$triggerState")
-        when (triggerState) {
-            TriggerState.WAITING_TO_LEAVE_D -> {
-                if (observed != null && observed != VehicleGear.GEAR_DRIVE) {
-                    triggerState = TriggerState.WAITING_FOR_D
-                    reminderStore.updateState(triggerState.name)
-                    Log.i(REMINDER_TAG, "left D; waiting for next D")
+    private fun confirmReminderCancellation() {
+        val reminder = pendingCommand ?: return
+        if (!canCancelReminder()) return
+        AlertDialog.Builder(this)
+            .setTitle(R.string.cancel_reminder_question)
+            .setMessage(reminder.message)
+            .setNegativeButton(R.string.keep_reminder, null)
+            .setPositiveButton(R.string.cancel_reminder) { _, _ ->
+                if (!canCancelReminder()) return@setPositiveButton
+                if (!reminderStore.cancelPending(reminder)) {
+                    Toast.makeText(this, R.string.cancel_reminder_failed, Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
                 }
+                stopService(Intent(this, ParkingReminderService::class.java))
+                feedbackKind = FeedbackKind.NONE
+                sttError = false
+                syncStoredReminder()
             }
-            TriggerState.WAITING_FOR_D -> {
-                if (observed == VehicleGear.GEAR_DRIVE) {
-                    triggerState = TriggerState.WAITING_FOR_P
-                    reminderStore.updateState(triggerState.name)
-                    taskStatus.text = "실행 대기: P단 진입"
-                    Log.i(REMINDER_TAG, "D observed; armed for P")
-                }
-            }
-            TriggerState.WAITING_FOR_P -> {
-                if (observed == VehicleGear.GEAR_PARK) {
-                    val reminder = pendingCommand ?: return
-                    if (!reminderStore.updateState(TriggerState.SHOWING.name)) {
-                        Log.e(REMINDER_TAG, "reminder show state save failed")
-                        return
-                    }
-                    triggerState = TriggerState.SHOWING
-                    reminderText.text = reminder.message
-                    taskStatus.text = "알림 실행됨"
-                    Log.i(REMINDER_TAG, "reminder shown original=${reminder.original} message=${reminder.message}")
-                    reminderSpeaker.announce(
-                        eventId = "reminder:${++speechEventCounter}",
-                        kind = "reminder",
-                        text = reminder.message
-                    )
-                }
-            }
-            else -> Unit
-        }
-        renderUiState()
+            .show()
     }
 
+    private fun canCancelReminder(): Boolean =
+        resumed && gearReadSinceStart && currentGear == VehicleGear.GEAR_PARK &&
+            sttState == SttState.IDLE && pendingCommand != null && triggerState != TriggerState.SHOWING
+
     private fun completeReminder() {
-        val reminder = pendingCommand ?: return
-        if (triggerState != TriggerState.SHOWING) return
+        if (pendingCommand == null || triggerState != TriggerState.SHOWING) return
         if (!reminderStore.complete()) {
             taskStatus.text = "완료 저장 실패"
             Log.e(REMINDER_TAG, "reminder completion save failed")
             return
         }
-        Log.i(REMINDER_TAG, "reminder completed original=${reminder.original}")
+        Log.i(REMINDER_TAG, "reminder completed")
+        getSystemService(NotificationManager::class.java).cancel(ParkingReminderService.REMINDER_NOTIFICATION_ID)
         triggerState = TriggerState.NONE
         pendingCommand = null
-        pendingSource = null
         feedbackKind = FeedbackKind.COMPLETE
         taskStatus.text = "완료"
         renderUiState()
@@ -657,7 +654,7 @@ class MainActivity : Activity() {
     private fun isCurrentSttSession(sdk: SpeechToText, sessionId: Long): Boolean =
         speechToText === sdk && activeSttSessionId == sessionId
 
-    private fun startStt() {
+    private fun startStt(replacement: ReminderStore.Pending? = null) {
         if (!started || !gearReadSinceStart || currentGear != VehicleGear.GEAR_PARK) {
             reportStt("P단 확인 후 음성 인식을 시작할 수 있습니다", true)
             return
@@ -675,6 +672,9 @@ class MainActivity : Activity() {
         sttResult.text = "인식 결과: 없음"
         sttResult.visibility = View.GONE
         sttResult.setTextColor(getColor(R.color.chacha_text))
+        if (replacement != null) {
+            ensureReminderMonitoring(ParkingReminderService.ACTION_STOP_CONFIRMATION)
+        }
         try {
             val sdk = SpeechToText(applicationContext, Mode.ON_DEVICE)
             val sessionId = ++sttSessionCounter
@@ -688,7 +688,6 @@ class MainActivity : Activity() {
                 override fun onSuccess() {
                     runOnUiThread {
                         if (!isCurrentSttSession(sdk, sessionId) || !started) return@runOnUiThread
-                        sttState = SttState.RECOGNIZING
                         reportStt("SDK 초기화 성공")
                         try {
                             sdk.setLocale(Locale.KOREA)
@@ -698,21 +697,27 @@ class MainActivity : Activity() {
                                 override fun onReady() {
                                     runOnUiThread {
                                         if (isCurrentSttSession(sdk, sessionId) &&
-                                            sttState == SttState.RECOGNIZING) reportStt("마이크 준비")
+                                            sttState == SttState.INITIALIZING) {
+                                            sttState = SttState.RECOGNIZING
+                                            reportStt("마이크 준비")
+                                        }
                                     }
                                 }
 
                                 override fun onStartedRecognition() {
                                     runOnUiThread {
                                         if (isCurrentSttSession(sdk, sessionId) &&
-                                            sttState == SttState.RECOGNIZING) reportStt("음성 인식 시작")
+                                            sttState != SttState.WAITING_FOR_FINAL) {
+                                            sttState = SttState.RECOGNIZING
+                                            reportStt("음성 인식 시작")
+                                        }
                                     }
                                 }
 
                                 override fun onUpdated(stt: String, completed: Boolean) {
                                     Log.i(STT_TAG, "callback onUpdated session=$sessionId " +
                                         "active=$activeSttSessionId state=$sttState " +
-                                        "completed=$completed text=$stt")
+                                        "completed=$completed")
                                     runOnUiThread {
                                         if (!isCurrentSttSession(sdk, sessionId)) {
                                             Log.w(STT_TAG, "stale onUpdated ignored session=$sessionId " +
@@ -724,10 +729,12 @@ class MainActivity : Activity() {
                                         sttResult.visibility = View.VISIBLE
                                         sttResult.setTextColor(getColor(if (completed) R.color.chacha_success else R.color.chacha_muted))
                                         Log.i(STT_TAG, "result displayed session=$sessionId " +
-                                            "completed=$completed text=$stt")
+                                            "completed=$completed")
                                         if (completed) {
                                             reportStt("최종 결과 수신")
-                                            val registered = registerReminder(stt.trim(), ReminderStore.SOURCE_STT)
+                                            val registered = registerReminder(
+                                                stt.trim(), ReminderStore.SOURCE_STT, replacement
+                                            )
                                             finishSttSession(
                                                 stopRecognition = sttState != SttState.WAITING_FOR_FINAL
                                             )
@@ -851,6 +858,7 @@ class MainActivity : Activity() {
             listening && sttState == SttState.INITIALIZING -> "음성 인식을 준비하고 있어요"
             listening && sttState == SttState.WAITING_FOR_FINAL -> "최종 문장을 확인하고 있어요"
             listening -> "듣고 있어요"
+            feedbackKind == FeedbackKind.PENDING -> getString(R.string.pending_registration_title)
             feedbackKind == FeedbackKind.ERROR -> "알림을 등록하지 못했어요"
             sttError -> "음성 인식에 문제가 있어요"
             registered -> "알림 등록 완료"
@@ -858,21 +866,28 @@ class MainActivity : Activity() {
             else -> getString(R.string.hero_question)
         }
         stateDescription.text = when {
+            sttState == SttState.INITIALIZING -> getString(R.string.voice_preparing_hint)
             listening -> "인식된 문장을 확인하고 있어요."
+            feedbackKind == FeedbackKind.PENDING -> getString(R.string.pending_registration_hint)
             feedbackKind == FeedbackKind.ERROR -> "인식 결과와 등록 결과를 확인해 주세요."
             sttError -> "다시 마이크를 눌러 시도해 주세요."
             registered -> "차가 다음 주차를 기억할게요."
             feedbackKind == FeedbackKind.COMPLETE -> "필요한 알림을 다시 맡길 수 있어요."
             else -> getString(R.string.brand_slogan)
         }
-        pendingText.text = if (pendingCommand?.original == ReminderStore.SUPPORTED_COMMAND)
-            getString(R.string.pending_notebook) else pendingCommand?.original.orEmpty()
+        pendingText.text = pendingCommand?.message.orEmpty()
         pendingHint.text = if (triggerState == TriggerState.WAITING_FOR_P)
             getString(R.string.pending_armed) else getString(R.string.pending_next_park)
         pendingText.visibility = if (registered && !listening) View.VISIBLE else View.GONE
         pendingHint.visibility = if (registered && !listening) View.VISIBLE else View.GONE
-        sttResult.visibility = if (sttHasResult && (listening ||
-            (feedbackKind == FeedbackKind.ERROR && !registered))) View.VISIBLE else View.GONE
+        retryVoiceButton.visibility = if (
+            registered && !listening && started && currentGear == VehicleGear.GEAR_PARK &&
+            triggerState == TriggerState.WAITING_FOR_D
+        ) View.VISIBLE else View.GONE
+        cancelReminderButton.visibility = if (canCancelReminder()) View.VISIBLE else View.GONE
+        sttResult.visibility = if (sttHasResult &&
+            (listening || feedbackKind == FeedbackKind.ERROR || feedbackKind == FeedbackKind.PENDING)
+        ) View.VISIBLE else View.GONE
         taskStatus.visibility = if (feedbackKind == FeedbackKind.ERROR) View.VISIBLE else View.GONE
         sttStatus.visibility = if (listening || sttError) View.VISIBLE else View.GONE
         updateMicMotion()
@@ -911,15 +926,10 @@ class MainActivity : Activity() {
         }
     }
 
-    private enum class FeedbackKind { NONE, ERROR, COMPLETE }
+    private enum class FeedbackKind { NONE, ERROR, PENDING, COMPLETE }
 
     private enum class SttState { IDLE, INITIALIZING, RECOGNIZING, WAITING_FOR_FINAL }
 
-    private data class Reminder(val original: String, val message: String)
-
-    private enum class TriggerState {
-        NONE, NEW, WAITING_TO_LEAVE_D, WAITING_FOR_D, WAITING_FOR_P, SHOWING
-    }
 
     private fun fail(message: String, error: Exception? = null) {
         runOnUiThread {
@@ -934,6 +944,8 @@ class MainActivity : Activity() {
         private const val REMINDER_TAG = "ChachaReminder"
         private const val STT_TAG = "ChachaStt"
         private const val DRIVE_TAG = "ChachaDrive"
+        private const val NOTIFICATIONS_REQUESTED = "notifications_requested"
+        private const val NOTIFICATION_PERMISSION_REQUEST = 1
         private const val STT_PERMISSION = "pleos.car.permission.STT_SERVICE"
         private const val FINAL_RESULT_WAIT_MS = 15_000L
     }

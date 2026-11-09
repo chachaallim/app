@@ -1,47 +1,30 @@
 # 차차알림 (ChaCha Allim)
 
-**말로 맡기면, 차가 기억합니다.**
+**말로 맡기고, 차가 기억합니다.**
 
-영문 계정·URL 표기: `chachaallim`
+차차알림은 Pleos Connect용 음성 기반 차량 리마인더입니다. 출발 전에 맡긴 일을 다음 주차 시점에 알려줍니다.
 
-차차알림은 현대 Pleos Connect 환경을 위한 음성 기반 차량 리마인더 앱입니다. 운전자가 주차 상태에서 음성으로 할 일을 등록하면, 이후 차량이 주행 상태를 거쳐 다시 주차 상태가 되었을 때 알림을 표시하고 음성으로 안내합니다.
+## 사용 방법
 
-## 주요 기능
+1. 주차(P) 상태에서 앱 마이크를 누르고 “내릴 때 뒷자리 가방 챙기라고 알려줘”라고 말합니다.
+2. 등록된 알림을 확인합니다. 출발 전에는 **다시 말하기**로 교체하거나 **알림 취소**로 삭제할 수 있습니다.
+3. Pleos Connect Virtual Console에서 기어를 **P → D → P**로 전환합니다.
+4. 주차 알림 카드와 음성 안내를 확인하고 **완료**를 누릅니다. 다른 앱 사용 중에는 음성 안내와 함께 알림 권한이 허용된 경우 시스템 알림이 표시됩니다.
 
-- **음성 리마인더 등록:** 주차(P) 상태에서 음성 명령으로 알림 생성
-- **차량 상태 인식:** 기어 상태 변화(P → D → P)를 이용한 하차 시점 알림
-- **화면 및 음성 알림:** 리마인더 카드 표시 및 TTS 음성 안내
-- **알림 완료:** 확인한 리마인더를 완료 처리
+## 구현 범위
 
-## 사용 예시
+- Pleos SpeechToText 3.3.1의 온디바이스 모드로 음성 요청을 받아씁니다.
+- 지원하는 한국어 요청 패턴을 안내 문구로 변환하고 대기 알림 1개를 기기에 저장합니다.
+- 포그라운드 서비스가 기어 상태를 감시하고 Pleos TextToSpeech 3.3.1로 안내합니다.
+- 신규 음성 등록은 P단에서 지원합니다.
 
-1. 주차 상태에서 “내릴 때 노트북 챙기라고 알려줘”라고 말합니다.
-2. 차차알림이 리마인더를 등록합니다.
-3. 차량이 주행(D) 상태를 거쳐 다시 주차(P) 상태가 됩니다.
-4. “내리기 전에 노트북을 챙겨 주세요.”라는 알림과 음성 안내가 제공됩니다.
+## 빌드
 
-## 개발 환경
+Android Studio에서 이 폴더를 열거나 Gradle Wrapper를 사용합니다. Android SDK 37과 Pleos Connect 호환 에뮬레이터 또는 차량 환경이 필요합니다. 앱 패키지명은 `com.chachaallim.app`입니다.
 
-- Kotlin / Android
-- Android Automotive OS
-- Hyundai Pleos Connect SDK
-- Pleos SpeechToText 및 TextToSpeech
-- Android Studio
+```sh
+./gradlew assembleDebug testDebugUnitTest
+./gradlew assembleRelease
+```
 
-## APK
-
-차차알림(ChaCha Allim) 최종 서명 APK입니다. 공모전 규정에 따라 `apk/` 폴더에 있습니다. Android 패키지명은 `com.chachaallim.app`입니다.
-
-- [apk/사륜구동_차차알림_release.apk](apk/사륜구동_차차알림_release.apk)
-
-새 패키지 `com.chachaallim.app`은 기존 앱과 별도로 설치되며, 기존 앱의 데이터는 자동으로 이전되지 않습니다. 설치 및 사용에는 지원되는 차량용 Android 환경이 필요합니다.
-
-## 현재 구현 범위
-
-현재 버전은 차차알림 앱이 전면에서 실행된 상태에서 기어 상태 변화를 감지하여 리마인더를 안내하는 MVP입니다. 백그라운드 상태에서의 알림 보장은 아직 구현 범위에 포함되지 않습니다.
-
-현대자동차그룹 차량용 앱 개발 공모전 출품작
-
----
-
-**ChaCha Allim** is a voice-powered vehicle reminder app for Hyundai Pleos Connect, designed to help drivers remember important items when parking.
+제출용 서명 APK는 `apk/사륜구동_차차알림_release.apk`에 있습니다.

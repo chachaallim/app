@@ -16,7 +16,10 @@ import android.util.Log
 import java.util.Locale
 
 /** Plays one spoken confirmation for each successful reminder state transition. */
-class PleosReminderSpeaker(context: Context) {
+class PleosReminderSpeaker(
+    context: Context,
+    private val onPlaybackFinished: () -> Unit = {}
+) {
     private val appContext = context.applicationContext
     private val mainHandler = Handler(Looper.getMainLooper())
     private val audioManager = appContext.getSystemService(AudioManager::class.java)
@@ -61,7 +64,7 @@ class PleosReminderSpeaker(context: Context) {
 
     fun announce(eventId: String, kind: String, text: String) {
         if (!active) {
-            Log.w(TAG, "announcement skipped: Activity stopped kind=$kind")
+            Log.w(TAG, "announcement skipped: speaker stopped kind=$kind")
             return
         }
         if (current?.eventId == eventId || pending?.eventId == eventId) {
@@ -171,7 +174,7 @@ class PleosReminderSpeaker(context: Context) {
         current = request
         try {
             engine.speak(request.text)
-            Log.i(TAG, "speak submitted id=${request.eventId} kind=${request.kind} text=${request.text}")
+            Log.i(TAG, "speak submitted id=${request.eventId} kind=${request.kind}")
         } catch (e: Exception) {
             Log.e(TAG, "speak failed id=${request.eventId}", e)
             finishCurrent("speak exception")
@@ -184,6 +187,7 @@ class PleosReminderSpeaker(context: Context) {
         if (finished != null) Log.i(TAG, "playback finished id=${finished.eventId} reason=$reason")
         abandonFocus()
         if (active) speakPending()
+        if (finished != null) onPlaybackFinished()
     }
 
     private fun abandonFocus() {

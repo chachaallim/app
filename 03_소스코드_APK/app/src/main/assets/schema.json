@@ -8,16 +8,32 @@
       "type": "function",
       "function": {
         "name": "ADD_REMINDER",
-        "description": "Registers a supported reminder for the next transition from drive to park.",
+        "description": "Reminds the user to do something after driving, when they next park or get out. Do not interpret a request to operate vehicle controls as a reminder. Ask the user to clarify an unclear reminder time before registering.",
         "parameters": {
           "type": "object",
           "properties": {
+            "trigger": {
+              "type": "string",
+              "enum": [
+                "next_park",
+                "unclear",
+                "unsupported"
+              ],
+              "description": "Use next_park only for an explicit request to be reminded when next parking or getting out of the car. Use unclear for a missing or ambiguous time and unsupported for a specific clock time, date, or another event."
+            },
+            "message": {
+              "type": "string",
+              "description": "A short Korean sentence to read aloud at parking. Preserve the requested action, item, and location. Remove the request to remind and the timing phrase. For example, say '트렁크에 있는 식혜를 챙겨 가세요.' Preserve the meaning and do not invent details."
+            },
             "command": {
               "type": "string",
-              "description": "The user's reminder request in Korean."
+              "description": "The original reminder request verbatim when available."
             }
           },
-          "required": ["command"]
+          "required": [
+            "trigger",
+            "message"
+          ]
         },
         "component": "service"
       }
