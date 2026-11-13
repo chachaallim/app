@@ -156,7 +156,7 @@ app/
     <td>
       <h3>② 알맞은 순간 판단</h3>
       "주차하시면 알려 드릴게요"라고 답하고, 기어 P → D → P를 지켜보며 주행 후 주차한 순간을 기다립니다.<br><br>
-      <b>구현 완료</b> · Vehicle(기어 상태) SDK<br><br>
+      <b>구현 완료</b> · Android Automotive 차량 속성 API (CarPropertyManager)<br><br>
       화면: 알림 등록 완료
     </td>
   </tr>
@@ -356,7 +356,7 @@ app/
     <td nowrap>✅ 구현 완료</td>
     <td nowrap>차량 상태 감지</td>
     <td>기어 P → D → P로 주행 후 주차 상황 인식</td>
-    <td nowrap>Vehicle SDK</td>
+    <td nowrap>CarPropertyManager</td>
   </tr>
   <tr>
     <td nowrap>✅ 구현 완료</td>
@@ -374,7 +374,7 @@ app/
     <td nowrap>✅ 구현 완료</td>
     <td nowrap>백그라운드 알림</td>
     <td>다른 앱을 쓰는 중에도 기어 P → D → P를 감지해 음성 안내 + 시스템 알림</td>
-    <td nowrap>포그라운드 서비스 · Vehicle SDK</td>
+    <td nowrap>포그라운드 서비스 · CarPropertyManager</td>
   </tr>
   <tr>
     <td nowrap>✅ 구현 완료</td>
@@ -404,7 +404,7 @@ app/
     <td nowrap>🛠️ 개발·검증 예정</td>
     <td nowrap>차량 연동 안정화</td>
     <td>실제 차량과 다양한 주행·주차 예외 상황 검증</td>
-    <td nowrap>Vehicle SDK</td>
+    <td nowrap>CarPropertyManager</td>
   </tr>
   <tr>
     <td nowrap>🛠️ 개발·검증 예정</td>
