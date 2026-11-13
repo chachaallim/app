@@ -38,27 +38,32 @@
   <tr>
     <th nowrap>번호</th>
     <th nowrap>제출물</th>
-    <th>위치</th>
+    <th nowrap>위치</th>
+    <th nowrap>QR</th>
   </tr>
   <tr>
     <td nowrap>01</td>
     <td nowrap>접수양식(기획서)</td>
-    <td>앱 프로젝트 소개 · 심사 자료 – <a href="01_접수양식(기획서)/%EC%95%B1%20%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EC%86%8C%EA%B0%9C%20%C2%B7%20%EC%8B%AC%EC%82%AC%20%EC%9E%90%EB%A3%8C_%EC%B0%A8%EC%B0%A8%EC%95%8C%EB%A6%BC.pdf">PDF</a> · <a href="01_접수양식(기획서)/%EC%95%B1%20%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EC%86%8C%EA%B0%9C%20%C2%B7%20%EC%8B%AC%EC%82%AC%20%EC%9E%90%EB%A3%8C_%EC%B0%A8%EC%B0%A8%EC%95%8C%EB%A6%BC.docx">Word</a></td>
+    <td nowrap>앱 프로젝트 소개 · 심사 자료 – <a href="01_접수양식(기획서)/%EC%95%B1%20%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EC%86%8C%EA%B0%9C%20%C2%B7%20%EC%8B%AC%EC%82%AC%20%EC%9E%90%EB%A3%8C_%EC%B0%A8%EC%B0%A8%EC%95%8C%EB%A6%BC.pdf">PDF</a> · <a href="01_접수양식(기획서)/%EC%95%B1%20%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EC%86%8C%EA%B0%9C%20%C2%B7%20%EC%8B%AC%EC%82%AC%20%EC%9E%90%EB%A3%8C_%EC%B0%A8%EC%B0%A8%EC%95%8C%EB%A6%BC.docx">Word</a></td>
+    <td></td>
   </tr>
   <tr>
     <td nowrap>02</td>
     <td nowrap>시연 영상<br>화면 캡처</td>
-    <td><a href="02_시연영상/시연영상_차차알림.mp4">시연 영상 – 시연영상_차차알림.mp4</a> (22초, 1080p, 소리 포함)<br><a href="02_시연영상/화면캡처">화면 캡처 4장</a><br>YouTube 시연 영상 – <a href="https://youtu.be/sQOyIcJfOMw">https://youtu.be/sQOyIcJfOMw</a><br><img src="02_시연영상/QR_시연영상_차차알림.png" width="110" alt="시연 영상 QR"></td>
+    <td nowrap><a href="02_시연영상/시연영상_차차알림.mp4">시연 영상 – 시연영상_차차알림.mp4</a> (22초, 1080p, 소리 포함)<br><a href="02_시연영상/화면캡처">화면 캡처 4장</a><br>YouTube 시연 영상 – <a href="https://youtu.be/sQOyIcJfOMw">https://youtu.be/sQOyIcJfOMw</a></td>
+    <td align="center" valign="middle"><img src="02_시연영상/QR_시연영상_차차알림.png" width="110" alt="시연 영상 QR"></td>
   </tr>
   <tr>
     <td nowrap>03</td>
     <td nowrap>소스코드<br>APK</td>
-    <td><a href="03_소스코드_APK">소스코드 – 03_소스코드_APK</a><br><a href="03_소스코드_APK/apk/사륜구동_차차알림_release.apk">APK – 사륜구동_차차알림_release.apk</a></td>
+    <td nowrap><a href="03_소스코드_APK">소스코드 – 03_소스코드_APK</a><br><a href="03_소스코드_APK/apk/사륜구동_차차알림_release.apk">APK – 사륜구동_차차알림_release.apk</a></td>
+    <td></td>
   </tr>
   <tr>
     <td nowrap>04</td>
     <td nowrap>숏폼</td>
-    <td>YouTube Shorts – <a href="https://youtube.com/shorts/FVd4p6Rp97Y">https://youtube.com/shorts/FVd4p6Rp97Y</a><br><img src="04_숏폼/QR_숏폼_차차알림.png" width="110" alt="숏폼 QR"><br>채널 <a href="https://www.youtube.com/@chachaallim">https://www.youtube.com/@chachaallim</a></td>
+    <td nowrap>YouTube Shorts – <a href="https://youtube.com/shorts/FVd4p6Rp97Y">https://youtube.com/shorts/FVd4p6Rp97Y</a><br>채널 <a href="https://www.youtube.com/@chachaallim">https://www.youtube.com/@chachaallim</a></td>
+    <td align="center" valign="middle"><img src="04_숏폼/QR_숏폼_차차알림.png" width="110" alt="숏폼 QR"></td>
   </tr>
 </table>
 
