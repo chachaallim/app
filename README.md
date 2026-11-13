@@ -186,16 +186,16 @@ app/
 
 <table>
   <tr>
-    <td nowrap><b>실행 환경</b></td>
-    <td>Pleos Connect 에뮬레이터(Android Automotive OS) + Pleos Playground 차량 시뮬레이터(Virtual Console)</td>
-  </tr>
-  <tr>
     <td nowrap><b>에뮬레이터</b></td>
     <td>Pleos Connect Emulator v2.1.0 (Android Automotive OS 14, API 34)</td>
   </tr>
   <tr>
     <td nowrap><b>테스트 화면 규격</b></td>
     <td>2560 × 1440 px, 가로 16:9, 160 dpi</td>
+  </tr>
+  <tr>
+    <td nowrap><b>시뮬레이터</b></td>
+    <td>Pleos Playground 차량 시뮬레이터(Virtual Console) – 기어 P → D → P 변경</td>
   </tr>
   <tr>
     <td nowrap><b>개발 환경</b></td>
