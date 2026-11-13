@@ -44,7 +44,7 @@
   <tr>
     <td nowrap>01</td>
     <td nowrap>접수양식(기획서)</td>
-    <td nowrap>앱 프로젝트 소개 · 심사 자료 – <a href="01_접수양식(기획서)/%EC%95%B1%20%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EC%86%8C%EA%B0%9C%20%C2%B7%20%EC%8B%AC%EC%82%AC%20%EC%9E%90%EB%A3%8C_%EC%B0%A8%EC%B0%A8%EC%95%8C%EB%A6%BC.pdf">PDF</a> · <a href="01_접수양식(기획서)/%EC%95%B1%20%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EC%86%8C%EA%B0%9C%20%C2%B7%20%EC%8B%AC%EC%82%AC%20%EC%9E%90%EB%A3%8C_%EC%B0%A8%EC%B0%A8%EC%95%8C%EB%A6%BC.docx">Word</a></td>
+    <td nowrap>앱 프로젝트 소개 · 심사 자료 – <a href="01_접수양식(기획서)/%EC%A0%91%EC%88%98%EC%96%91%EC%8B%9D(%EA%B8%B0%ED%9A%8D%EC%84%9C)_%EC%B0%A8%EC%B0%A8%EC%95%8C%EB%A6%BC.pdf">PDF</a> · <a href="01_접수양식(기획서)/%EC%A0%91%EC%88%98%EC%96%91%EC%8B%9D(%EA%B8%B0%ED%9A%8D%EC%84%9C)_%EC%B0%A8%EC%B0%A8%EC%95%8C%EB%A6%BC.docx">Word</a></td>
     <td></td>
   </tr>
   <tr>
@@ -78,7 +78,7 @@ app/
 ├── README.md
 ├── logo_차차알림.png                 README 로고
 ├── 01_접수양식(기획서)/               PDF · Word
-│   └── 앱 프로젝트 소개 · 심사 자료_차차알림
+│   └── 접수양식(기획서)_차차알림
 ├── 02_시연영상/
 │   ├── 시연영상_차차알림.mp4
 │   ├── QR_시연영상_차차알림.png       YouTube 시연 영상 QR
