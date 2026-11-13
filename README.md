@@ -48,7 +48,7 @@
   <tr>
     <td nowrap>02</td>
     <td nowrap>시연 영상<br>화면 캡처</td>
-    <td><a href="02_시연영상/시연영상_차차알림.mp4">시연 영상 – 시연영상_차차알림.mp4</a> (22초, 1080p, 소리 포함)<br><a href="02_시연영상/화면캡처">화면 캡처 4장</a><br>YouTube 링크(업로드 후 추가)</td>
+    <td><a href="02_시연영상/시연영상_차차알림.mp4">시연 영상 – 시연영상_차차알림.mp4</a> (22초, 1080p, 소리 포함)<br><a href="02_시연영상/화면캡처">화면 캡처 4장</a><br>YouTube 시연 영상 – <a href="https://youtu.be/sQOyIcJfOMw">https://youtu.be/sQOyIcJfOMw</a><br><img src="02_시연영상/QR_시연영상_차차알림.png" width="110" alt="시연 영상 QR"></td>
   </tr>
   <tr>
     <td nowrap>03</td>
@@ -58,7 +58,7 @@
   <tr>
     <td nowrap>04</td>
     <td nowrap>숏폼</td>
-    <td>YouTube Shorts 링크(업로드 후 추가)<br>채널 <a href="https://www.youtube.com/@chachaallim">https://www.youtube.com/@chachaallim</a></td>
+    <td>YouTube Shorts – <a href="https://youtube.com/shorts/FVd4p6Rp97Y">https://youtube.com/shorts/FVd4p6Rp97Y</a><br><img src="04_숏폼/QR_숏폼_차차알림.png" width="110" alt="숏폼 QR"><br>채널 <a href="https://www.youtube.com/@chachaallim">https://www.youtube.com/@chachaallim</a></td>
   </tr>
 </table>
 
@@ -76,6 +76,7 @@ app/
 │   └── 앱 프로젝트 소개 · 심사 자료_차차알림
 ├── 02_시연영상/
 │   ├── 시연영상_차차알림.mp4
+│   ├── QR_시연영상_차차알림.png       YouTube 시연 영상 QR
 │   └── 화면캡처/                      앱 화면 4컷
 ├── 03_소스코드_APK/                   Android Studio 프로젝트
 │   ├── README.md                      개발자 기능 설명서
@@ -89,7 +90,8 @@ app/
 │       │   ├── ReminderStore.kt           알림 · 진행 상태 저장, 완료 처리
 │       │   └── GleoReminderReceiver.kt    Gleo AI 음성 명령 연동 준비
 │       └── res/                           화면 레이아웃 · 아이콘 · 문구
-└── 04_숏폼/                           숏폼 링크(업로드 후 추가)
+└── 04_숏폼/
+    └── QR_숏폼_차차알림.png           YouTube Shorts QR
 ```
 
 ---
