@@ -222,32 +222,32 @@ app/
     <th>방법 · 결과</th>
   </tr>
   <tr>
-    <td nowrap>1)</td>
+    <td nowrap>①</td>
     <td nowrap>설치</td>
     <td>Pleos Connect 에뮬레이터를 실행하고 APK 설치<br><code>adb install 03_소스코드_APK/apk/사륜구동_차차알림_release.apk</code></td>
   </tr>
   <tr>
-    <td nowrap>2)</td>
+    <td nowrap>②</td>
     <td nowrap>실행</td>
     <td>앱 목록에서 <b>차차알림</b>(<code>com.chachaallim.app</code>) 실행</td>
   </tr>
   <tr>
-    <td nowrap>3)</td>
+    <td nowrap>③</td>
     <td nowrap>1) 말로 맡기기</td>
     <td>기어 <b>P(주차)</b>에서 마이크 버튼을 누르고 말하기 – 예) "내릴 때 노트북 챙기라고 알려 줘" → "주차하시면 알려 드릴게요"</td>
   </tr>
   <tr>
-    <td nowrap>4)</td>
+    <td nowrap>④</td>
     <td nowrap>2) 알맞은 순간 판단</td>
     <td>차량 시뮬레이터(Virtual Console)에서 기어를 <b>P → D</b>로 바꿔 주행 (알림 없음)</td>
   </tr>
   <tr>
-    <td nowrap>5)</td>
+    <td nowrap>⑤</td>
     <td nowrap>3) 안전하게 전하기</td>
     <td>기어를 다시 <b>D → P</b>로 바꾸면 화면 알림 카드 + 음성 안내</td>
   </tr>
   <tr>
-    <td nowrap>6)</td>
+    <td nowrap>⑥</td>
     <td nowrap>4) 확인하고 정리하기</td>
     <td><b>[완료]</b>를 누르면 알림 정리</td>
   </tr>
