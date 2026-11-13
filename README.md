@@ -57,7 +57,7 @@
     <td nowrap>03</td>
     <td nowrap>소스코드<br>APK</td>
     <td nowrap><a href="03_소스코드_APK">소스코드 – 03_소스코드_APK</a><br><a href="03_소스코드_APK/apk/사륜구동_차차알림_release.apk">APK – 사륜구동_차차알림_release.apk</a></td>
-    <td></td>
+    <td align="center" valign="middle"><img src="03_소스코드_APK/QR_GitHub_차차알림.png" width="110" alt="GitHub QR"></td>
   </tr>
   <tr>
     <td nowrap>04</td>
@@ -85,6 +85,7 @@ app/
 │   └── 화면캡처/                      앱 화면 4컷
 ├── 03_소스코드_APK/                   Android Studio 프로젝트
 │   ├── README.md                      개발자 기능 설명서
+│   ├── QR_GitHub_차차알림.png         GitHub 저장소 QR
 │   ├── apk/사륜구동_차차알림_release.apk
 │   └── app/src/main/
 │       ├── java/com/chachaallim/app/
@@ -187,6 +188,14 @@ app/
   <tr>
     <td nowrap><b>실행 환경</b></td>
     <td>Pleos Connect 에뮬레이터(Android Automotive OS) + Pleos Playground 차량 시뮬레이터(Virtual Console)</td>
+  </tr>
+  <tr>
+    <td nowrap><b>에뮬레이터</b></td>
+    <td>Pleos Connect Emulator v2.1.0 (Android Automotive OS 14, API 34)</td>
+  </tr>
+  <tr>
+    <td nowrap><b>테스트 화면 규격</b></td>
+    <td>2560 × 1440 px, 가로 16:9, 160 dpi</td>
   </tr>
   <tr>
     <td nowrap><b>개발 환경</b></td>
